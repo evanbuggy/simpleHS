@@ -7,15 +7,17 @@ from math import pow, log
 
 lowerBounds = [-10, -10]
 upperBounds = [10, 10]
-improvisations = 100
+improvisations = 1000
 pitchAdjustingRate = 0.5
 pitchAdjustingProportion = 0.5
+worstFitnessIndex = 0
 worstFitness = 0
 HM_ConsideringRate = 0.75
 HM_Size = 100
-harmonyMemory = [None] * HM_Size
+harmonyMemory = [[0, 0]] * HM_Size
 
 def init():
+    global worstFitnessIndex
     global worstFitness
     # Initialise Harmony Memory with random values
     for i in range(len(harmonyMemory)):
@@ -26,10 +28,10 @@ def init():
         initFitness = fitness(newHarmony)
         # Keep track of the worst fitness during initialisation
         # We will use this when we update Harmony Memory with better results
-        # TODO: Track the index (where the worst fitness is) rather than the value
-        if initFitness > worstFitness:
+        if initFitness > fitness(harmonyMemory[worstFitnessIndex]):
+            worstFitnessIndex = i
             worstFitness = initFitness
-            print("New worst fitness: " + str(worstFitness))
+            print("New worst fitness at index " + str(worstFitnessIndex) + ": " + str(initFitness))
         harmonyMemory[i] = newHarmony
 
 def fitness(harmony):
@@ -37,8 +39,38 @@ def fitness(harmony):
 
 def consider(index):
     where = random.randint(0, HM_Size - 1)
-    print("Harmony being considered at " + str(where))
+    print("Harmony being considered at index " + str(where) + " of harmony memory")
     return harmonyMemory[where][index]
+
+def find_best():
+    # Used at the end of our harmony search to return the best fitness
+    bestFitnessIndex = 0
+    bestFitness = 100
+    for i in range(len(harmonyMemory)):
+        tempFitness = fitness(harmonyMemory[i])
+        if tempFitness < bestFitness:
+            bestFitness = tempFitness
+            bestFitnessIndex = i
+    # Returns the best fitness found in HM and its index in HM
+    return [bestFitness, bestFitnessIndex]
+
+def update_memory(harmony):
+    # If our newly generated harmony has a better fitness than the
+    # worst fitness in HM, we replace the corresponding harmony with the new one.
+    global worstFitness
+    global worstFitnessIndex
+    newFitness = fitness(harmony)
+    if newFitness < worstFitness:
+        harmonyMemory[worstFitnessIndex] = harmony
+        print("worstFitness being deleted...  being replaced by " + str(newFitness))
+        worstFitness = 0
+        for i in range(len(harmonyMemory)):
+            # Iterate through HM to find the new worstFitness
+            tempFitness = fitness(harmonyMemory[i])
+            if tempFitness > worstFitness:
+                worstFitness = tempFitness
+                worstFitnessIndex = i
+                # print("update_memory: " + str(worstFitness) + " is the newest worstFitness at index " + str(worstFitnessIndex))
 
 def main():
     global improvisations
@@ -67,9 +99,13 @@ def main():
                 print("New note generated at index " + str(i) + ": " + str(randomNote))
 
         # Increment num_imp. The loop ends once this reaches the value of "improvisations".
-        # TODO: Evaluate the fitness of the harmony after every iteration
-        # TODO: Adjust Harmony Memory according to the evaluated fitness
+        update_memory(harmony)
         num_imp += 1
+        results = find_best()
+        print("----------------------------------")
+        print("Best Harmony: " + str(harmonyMemory[results[1]]))
+        print("Best Fitness: " + str(results[0]))
+    
 
 if __name__ == "__main__":
     main()
