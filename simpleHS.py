@@ -7,7 +7,7 @@ from math import pow, log
 
 lowerBounds = [-10, -10]
 upperBounds = [10, 10]
-improvisations = 1000
+improvisations = 10000
 pitchAdjustingRate = 0.5
 pitchAdjustingProportion = 0.5
 worstFitnessIndex = 0
@@ -103,8 +103,8 @@ def main():
         num_imp += 1
         results = find_best()
         print("----------------------------------")
-        print("Best Harmony: " + str(harmonyMemory[results[1]]))
-        print("Best Fitness: " + str(results[0]))
+    print("Best Harmony: " + str(harmonyMemory[results[1]]))
+    print("Best Fitness: " + str(results[0]))
     
 
 if __name__ == "__main__":
