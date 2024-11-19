@@ -7,7 +7,7 @@ from math import pow, log
 
 lowerBounds = [-10, -10]
 upperBounds = [10, 10]
-improvisations = 10000
+improvisations = 100000
 pitchAdjustingRate = 0.5
 pitchAdjustingProportion = 0.5
 worstFitnessIndex = 0
