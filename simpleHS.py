@@ -1,19 +1,19 @@
 import sys, random
-from math import pow, log
+from math import pow, log, sin, pi
 
 # This solution only considers 2 inputs. Think of it
 # as analogous to a piece of music having 2 instruments.
 # It also always assumes the problem as a minimization problem.
 
-lowerBounds = [-10, -10]
-upperBounds = [10, 10]
-improvisations = 100000
-pitchAdjustingRate = 0.5
+lowerBounds = [0, 0] # [-10, -10] for Rosenbrock
+upperBounds = [pi, pi] # [10, 10] for Rosenbrock
+improvisations = 30000 # 10000 for Rosenbrock
+pitchAdjustingRate = 0.3 # 0.5 for Rosenbrock
 pitchAdjustingProportion = 0.5
 worstFitnessIndex = 0
 worstFitness = 0
-HM_ConsideringRate = 0.75
-HM_Size = 100
+HM_ConsideringRate = 0.85 # 0.75 for Rosenbrock
+HM_Size = 300 # 100 for Rosenbrock
 harmonyMemory = [[0, 0]] * HM_Size
 
 def init():
@@ -35,7 +35,8 @@ def init():
         harmonyMemory[i] = newHarmony
 
 def fitness(harmony):
-    return log(1 + pow(1 - harmony[0], 2) + 100 * pow(harmony[1] - pow(harmony[0], 2), 2))
+    # return log(1 + pow(1 - harmony[0], 2) + 100 * pow(harmony[1] - pow(harmony[0], 2), 2))
+    return (-sin(harmony[0]) * pow(sin(pow(harmony[0], 2) / pi), 20)) - (sin(harmony[1]) * pow(sin(2 * (pow(harmony[1], 2)) / pi), 20))
 
 def consider(index):
     where = random.randint(0, HM_Size - 1)
@@ -104,8 +105,7 @@ def main():
         results = find_best()
         print("----------------------------------")
     print("Best Harmony: " + str(harmonyMemory[results[1]]))
-    print("Best Fitness: " + str(results[0]))
-    
+    print("Best Fitness: " + str(results[0]))  
 
 if __name__ == "__main__":
     main()
